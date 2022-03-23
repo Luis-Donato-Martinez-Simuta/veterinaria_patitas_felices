@@ -1,7 +1,7 @@
 # veterinaria_patitas_felices
 
 
-#integrantes 
+# Integrantes 
 # 193213 José Alberto Hernández Ramírez
 # 193282 Oscar Antonio Perez Ocomatl
 # 193233 Luis Donato Martínez Símuta
