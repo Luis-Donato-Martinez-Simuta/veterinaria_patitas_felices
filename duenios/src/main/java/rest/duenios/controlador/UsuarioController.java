@@ -1,5 +1,10 @@
 package rest.duenios.controlador;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import rest.duenios.modelo.UsuarioJSON;
 import rest.duenios.modelo.UsuarioMascota;
 import rest.duenios.modelo.Mascota;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 //Esto esta corriendo en el puesto 8888
 
@@ -22,19 +28,20 @@ public class UsuarioController {
     @Autowired
     RestTemplate restTemplate;
 
-    @GetMapping(value = "/listaUsuarios")
+    @GetMapping(value = "/API/listaUsuarios")
     public List<Usuario> getListaUsuarios(){
         return usuarioRepository.findAll();
     }
     
-    @GetMapping(value="/usuari_por_id/{IdUsuario}")
+    @GetMapping(value="/API/usuario_por_id/{IdUsuario}")
     public Usuario getDuenio(@PathVariable("IdUsuario") int IdUsuario){
     	//System.out.println(IdUsuario);
     	Usuario usuario = new Usuario();
     	usuario = usuarioRepository.findByIdUsuario(IdUsuario);    	
 		return usuario;
     }
-    
+
+    /*
     @PostMapping(value="/logeo/{username}/{password}")
     public Usuario logue(@PathVariable("username") String username, @PathVariable("password") String password) {    	
     	List<Usuario> usuarios = usuarioRepository.findAll();
@@ -48,72 +55,63 @@ public class UsuarioController {
     	
     	return usuario;
     }
-    
-    
+    */
+    /*
     @PostMapping(value = "/nuevo_usuario")
     public Usuario addDuenio(@RequestBody Usuario usuario){
-    	
+
         return usuarioRepository.save(usuario);
-    }
-    
-    /*
-    @GetMapping(value = "/duenioConMascotas/{idDuenio}")
-    public List<Mascota> getDuenioConMascotas(@PathVariable("idDuenio") int idDuenio){
-    	//System.out.println("Buscando las mascotas del dueño");
-    	List<Mascota> listaMascotas = null;
-        Duenio duenio =  duenioRepository.findByIdDuenio(idDuenio);
-        DuenioMascota duenioMascota= null;
-        if (duenio != null){
-            duenioMascota = new DuenioMascota(duenio.getIdDuenio(), duenio.getNombre(), duenio.getTelefono(), duenio.getDireccion());
-            Mascota[] mascotas  =restTemplate.getForObject("http://localhost:7777/listByIdDuenio/"+duenioMascota.getIdDuenio(), Mascota[].class);
-            //duenioMascota.setMascotas(mascotas);
-            listaMascotas = Arrays.asList(mascotas);
-        }
-        return listaMascotas;
-    }
-    @GetMapping(value = "/duenio/direccion")
-    public List<Duenio> getDuenioByDireccion(@RequestBody Duenio duenio){
-        return duenioRepository.findDuenioByDireccion(duenio.getDireccion());
-    }
-    @GetMapping(value="/duenio/{idDuenio}")
-    public Duenio getDuenio(@PathVariable("idDuenio") int idDuenio){
-    	System.out.println(idDuenio);
-    	Duenio duenio = duenioRepository.findByIdDuenio(idDuenio);    	
-		return duenio;
+    }*/
 
+    private String getJWTToken(String username){
+        String secretKey = "secret";
+        List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+                .commaSeparatedStringToAuthorityList("ROLE_USER");
+
+        String token = Jwts
+                .builder()
+                .setId("petJWT")
+                //.setId("idUsuario")
+                .setSubject(username)
+                .claim("authorities",
+                        grantedAuthorities.stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList()))
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 6000000))
+                .signWith(SignatureAlgorithm.HS512,
+                        secretKey.getBytes()).compact();
+        return "Bearer " + token;
     }
 
-    @PostMapping(value = "/duenio/telefono")
-    public List<Duenio> getDuenioByCountry(@RequestBody Duenio duenio){
-        return duenioRepository.findAllByTelefono(duenio.getTelefono());
-    }
-    
-    @PostMapping(value = "/duenio/nombre")
-    public List<Duenio> getDuenioByName(@RequestBody Duenio duenio){
-    	System.out.println(duenio.getNombre());
-        return duenioRepository.findAllByNombre(duenio.getNombre());
-    }
-    
-    
-    @PostMapping(value = "/duenio/add")
-    public Duenio addDuenio(@RequestBody Duenio duenio){
-        return duenioRepository.save(duenio);
-    }
-    @PostMapping(value = "/duenio/update")
-    public Duenio updateDuenio(@RequestBody Duenio duenio){
-        if(duenioRepository.findByIdDuenio(duenio.getIdDuenio()) != null){
-            return duenioRepository.save(duenio);
+    /*@PostMapping(value = "/loginUser")
+    public Usuario getUser(@RequestBody UsuarioJSON usuario) {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        Usuario user = new Usuario();
+
+        for (Usuario u : usuarios) {
+            if(usuario.getUsuario().compareTo(u.getUserName()) == 0 && usuario.getPassword().compareTo(u.getPassword()) == 0){
+                user = u;
+                System.out.println("Usuario: " + user);
+            }else {
+                System.err.println("Datos Incorrectos!");
+            }
         }
-        return null;
-    }
-    @PostMapping(value = "/duenio/delete")
-    public Boolean deleteDuenio(@RequestBody Duenio duenio){
-        Duenio d = duenioRepository.findByIdDuenio(duenio.getIdDuenio());
-        if(d != null){
-            duenioRepository.delete(d);
-            return true;
+
+        return user;
+    }*/
+    @PostMapping(value = "/loginUser")
+    public String getUser(@RequestBody UsuarioJSON usuario){
+        Usuario user = usuarioRepository.findByUserNameAndPassword(usuario.getUsuario(), usuario.getPassword());
+        if(user != null){
+            System.out.println("Usuario ENCONTRADO: " + user);
+            //return user.getNombrePersonal();
+            String token = getJWTToken(usuario.getUsuario());
+            return  token;
+        }else{
+            System.err.println("No se encontro el usuario");
         }
-        return null;
+        return "Usuario No Encontrado";
     }
-    */
+
 }

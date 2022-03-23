@@ -6,9 +6,14 @@ import rest.duenios.modelo.Usuario;
 import java.util.List;
 
 public interface UsuarioRepository extends CrudRepository <Usuario, Integer> {
+
+    Usuario findByUserNameAndPassword(String usuario, String password);
+
     List<Usuario> findAll();
     Usuario findByIdUsuario(int IdUsuario);
     Usuario save(Usuario duenio);
+
+
     /*
     List<Usuario> findDuenioByDireccion(String direccion);
     Usuario findByIdDuenio(int idDuenio);

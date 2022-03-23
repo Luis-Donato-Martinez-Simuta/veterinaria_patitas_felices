@@ -21,8 +21,8 @@ public class Usuario {
     @Column(name = "Edad")
     private int edad;
 
-    @Column(name = "TipoUsuario")
-    private String  tipoUsuario;
+    //@Column(name = "TipoUsuario")
+    //private String  tipoUsuario;
     
     @Column(name = "Telefono")
     private String telefono;
@@ -38,7 +38,7 @@ public class Usuario {
 		this.userName = userName;
 		this.password = password;
 		this.edad = edad;
-		this.tipoUsuario = tipoUsuario;
+		//this.tipoUsuario = tipoUsuario;
 		this.telefono = telefono;
 		this.direccion = direccion;
 	}
@@ -87,13 +87,13 @@ public class Usuario {
 		this.edad = edad;
 	}
 
-	public String getTipoUsuario() {
+	/*public String getTipoUsuario() {
 		return tipoUsuario;
 	}
 
 	public void setTipoUsuario(String tipoUsuario) {
 		this.tipoUsuario = tipoUsuario;
-	}
+	}*/
 
 	public String getTelefono() {
 		return telefono;
