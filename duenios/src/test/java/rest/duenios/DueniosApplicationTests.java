@@ -1,4 +1,4 @@
-package floresnataren.duenios;
+package rest.duenios;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
