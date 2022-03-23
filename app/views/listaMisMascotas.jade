@@ -1,0 +1,77 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(http-equiv='X-UA-Compatible' content='IE=edge')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')    
+    link(rel='stylesheet', href='/stylesheets/main.css')
+    link(rel='stylesheet', href='/stylesheets/navBar.css')
+    title Mis mascotas
+    
+  body
+    header
+      .navbar
+        //button.active(href='#')  #{usuario.userName}
+        form(action="/listaMascotas", method="post") 
+          input(type="hidden" value=usuario.idUsuario, name="IdUsuario") 
+          button.active(href='#')  Mis Mascotas
+        //button(href='#')  Conocenos
+        form(action="/miPerfil", method="post") 
+          input(type="hidden" value=usuario.idUsuario, name="IdUsuario") 
+          button()  Mi perfil
+        form(action='/',,method='GET')
+          button(href='#')  LogOut
+    section#app.hero.is-link.is-fullheight        
+
+      .hero-body       
+        form(action='/nuevaMascota' method='POST')
+          input.form-control(type='hidden', value=usuario.idUsuario, name="IdUsuario")
+          button(class="btnAgrgar btn nuevo" type='submit') Agregar mascota                         
+        table
+            caption Mis mascotas
+            thead
+                tr
+                  th(scope='col') Id Mascota
+                  th(scope='col') Nombre mascota
+                  th(scope='col') Tipo
+                  th(scope='col') Edad años
+                  th(scope='col') Accioones
+                  //th(scope='col') 
+            tbody
+            each mascota in usuario.mascotas
+              tr 
+                td(data-label='Id Mascota')= mascota.idMascota
+                td(data-label='Nombre')= mascota.nombreMascota
+                td(data-label='Tipo')= mascota.tipo
+                td(data-label='Edad años')= mascota.edad
+                td(data-label='Acciones')                          
+                  form(action="verUnaMascota" method='POST') 
+                    input(type="hidden", value=mascota.idMascota, name='IdMascota')
+                    input(type="hidden", value=usuario.idUsuario, name='IdUsuario')
+                    button(class="btn info") Ver mascota
+                  //td(data-label='')                          
+                    form(action="" method='POST') 
+                      input(type="hidden" value= mascota.idMascota)
+                      button Eliminar                        
+                //tr
+                    td(data-label='Id Mascota') 1
+                    td(data-label='Nombre') Simba
+                    td(data-label='Tipo') Gato
+                    td(data-label='Edad años') 3
+                    td(data-label='Acciones')                          
+                      form(action="verUnaMascota" method='POST') 
+                        input(type="hiden" value= '1')
+                        button ver mascota
+                //tr      
+                    td(data-label='Id Mascota') 2
+                    td(data-label='Nombre') Dingo
+                    td(data-label='Tipo') Perro
+                    td(data-label='Edad años') 5
+                    td(data-label='Acciones')                          
+                      form(action="verUnaMascota" method='POST') 
+                        input(type="text" value= '2')
+                        button ver mascota                      
+                      
+                      
+
+    script(type='text/javascript' src='/javascripts/main.js')
