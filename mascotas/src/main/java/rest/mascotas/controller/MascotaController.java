@@ -29,7 +29,7 @@ public class MascotaController {
     public MascotaUsuario getMascotaPorIdUsuario(@PathVariable("IdUsuario") int IdUsuario){  
     	System.out.print("Id Usuario: ");
     	System.out.print(IdUsuario);
-    	Usuario usuario = restTemplate.getForObject("http://localhost:8888/usuari_por_id/"+IdUsuario , Usuario.class);
+    	Usuario usuario = restTemplate.getForObject("http://localhost:8888/usuario_por_id/"+IdUsuario , Usuario.class);
     	List<Mascota> mascotas;
     	mascotas = mascotaRepository.findByIdUsuario(IdUsuario);	
     	MascotaUsuario mascotaUsuario = new MascotaUsuario(usuario, mascotas);
