@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var axios = require('axios');
+const { response } = require('express');
+
 
 
 
@@ -15,50 +17,75 @@ router.get('/', function (req, res, next) {
 
 router.post('/logueo', function (req, res, next) {
   let usuario = {
-    userName: req.body.userName,
+    usuario: req.body.userName,
     password: req.body.password
   }
 
-  if (usuario.userName == "" || usuario.password == "") {
+  if (usuario.usuario == "" || usuario.password == "") {
     console.log("Campos imcompletos");
     res.render("login", {
       codigoAcceso: 2
     })
   } else {
-    let url = "http://localhost:8888/logeo/" + usuario.userName + '/' + usuario.password;
-    console.log(url)
-    axios.post(url)
-      .then(response => {
 
-        usuario = response.data;
-        //console.log(usuario);
-        if (usuario.idUsuario != 0) {
-          axios.get("http://localhost:7777/mascota_por_usuario/" + usuario.idUsuario)
-            .then((response) => {
+    axios({
+      method:"post",
+      url:"http://localhost:8888/loginUser",
+      data: usuario
+    }).then(response => {
 
-              usuario = response.data;
-              console.log(usuario);
-              res.render("ListaMisMascotas", {
-                usuario: usuario
-              })
-            })
-            .catch((error) => {
-              console.log(error);
-              res.render('construccion');
-            });
+      user = response.data;
+      
+      if(user != ''){
+        console.log(`${user[0]}`);
+        console.log(`${user[1]}`);
+        axios.get("http://localhost:7777/mascota_por_usuario/" + parseInt(user[0]))
+        .then(response => {
+          usuario = response.data;
+          console.log("Usuario: ", usuario)
+
+          res.render("ListaMisMascotas",{
+            usuario: usuario
+          })
+        }).catch(error => {
+          console.log(error);
+          res.render("construccion")
+        })
+
+        // axios({
+        //   method:"GET",
+        //   url: "http://localhost:7777/mascota_por_usuario/",
+        //   data: parseInt(user[0])
+        // })
+        // .then(response => {
+        //   usuario = response.data;
+        //   console.log("Usuario: ", usuario)
+
+        //   res.render("ListaMisMascotas",{
+        //     usuario: usuario
+        //   })
+
+        // })
+        // .catch(error => {
+        //   console.log(error);
+        //   res.render("construccion")
+        // })
 
 
-        } else {
-          console.log("Acceso denegado");
-          res.render('login', {
-            codigoAcceso: 1
-          });
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        res.render('construccion');
-      });
+      }else{
+        console.log("No existe usuario");
+        res.render('login',{
+          codigoAcceso: 1
+        })
+      }
+      
+  
+    })
+    .catch(error => {
+      console.log(error);
+      res.render('construccion')
+    })
+  
   }
 
 
@@ -215,7 +242,7 @@ router.post('/crearUsuario', function (req, res, next) {
       if(usuario.idUsuario == 0){
         res.render('login');
       }else{
-        axios.get("http://127.0.0.1:8888/usuari_por_id/" + usuario.idUsuario)
+        axios.get("http://127.0.0.1:8888/usuario_por_id/" + usuario.idUsuario)
         .then((response) => {
     
           let usuario = response.data;
@@ -246,7 +273,7 @@ router.post('/miPerfil', function (req, res, next) {
   let IdUsuario = req.body.IdUsuario
   console.log(IdUsuario);
 
-  axios.get("http://127.0.0.1:8888/usuari_por_id/" + IdUsuario)
+  axios.get("http://127.0.0.1:8888/usuario_por_id/" + IdUsuario)
     .then((response) => {
 
       let usuario = response.data;
