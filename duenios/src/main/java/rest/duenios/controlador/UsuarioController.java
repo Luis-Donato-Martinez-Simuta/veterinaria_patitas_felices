@@ -33,7 +33,7 @@ public class UsuarioController {
         return usuarioRepository.findAll();
     }
     
-    @GetMapping(value="/API/usuario_por_id/{IdUsuario}")
+    @GetMapping(value="/usuario_por_id/{IdUsuario}")
     public Usuario getDuenio(@PathVariable("IdUsuario") int IdUsuario){
     	//System.out.println(IdUsuario);
     	Usuario usuario = new Usuario();
@@ -101,17 +101,24 @@ public class UsuarioController {
         return user;
     }*/
     @PostMapping(value = "/loginUser")
-    public String getUser(@RequestBody UsuarioJSON usuario){
+    public List<String> getUser(@RequestBody UsuarioJSON usuario){
         Usuario user = usuarioRepository.findByUserNameAndPassword(usuario.getUsuario(), usuario.getPassword());
+        List<String> userLogin = new ArrayList<>();
         if(user != null){
             System.out.println("Usuario ENCONTRADO: " + user);
             //return user.getNombrePersonal();
             String token = getJWTToken(usuario.getUsuario());
-            return  token;
+            //return  token;
+            //userLogin.add(String.valueOf(user.getIdUsuario()));
+            userLogin.add(Integer.toString(user.getIdUsuario()));
+            userLogin.add(token);
+
+            return userLogin;
         }else{
             System.err.println("No se encontro el usuario");
+            return null;
         }
-        return "Usuario No Encontrado";
+
     }
 
 }
