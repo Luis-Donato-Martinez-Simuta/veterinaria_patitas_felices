@@ -6,27 +6,34 @@ html(lang='en')
     meta(name='viewport' content='width=device-width, initial-scale=1.0')    
     link(rel='stylesheet', href='/stylesheets/main.css')
     link(rel='stylesheet', href='/stylesheets/navBar.css')
-    title Mis mascotas
     
+
+    title Mis mascotas
+
   body
+
     header
       .navbar
         //button.active(href='#')  #{usuario.userName}
         form(action="/listaMascotas", method="post") 
-          input(type="hidden" value=usuario.idUsuario, name="IdUsuario") 
-          button.active(href='#')  Mis Mascotas
+          input(type="hidden" value=usuario.idUsuario, name="IdUsuario")  
+          input.form-control(type='hidden', value=token, name="token")         
+          button.active(href='')  Mis Mascotas
         //button(href='#')  Conocenos
-        form(action="/miPerfil", method="post") 
+        form(action="/VPF/miPerfil", method="post") 
           input(type="hidden" value=usuario.idUsuario, name="IdUsuario") 
+          input.form-control(type='hidden', value=token, name="token")
           button()  Mi perfil
-        form(action='/',,method='GET')
-          button(href='#')  LogOut
+        form()
+          button(onClick='logOut()')  LogOut
     section#app.hero.is-link.is-fullheight        
-
+      //label #{token}
       .hero-body       
-        form(action='/nuevaMascota' method='POST')
+        form(action='/VPF/nuevaMascota' method='POST' )
           input.form-control(type='hidden', value=usuario.idUsuario, name="IdUsuario")
-          button(class="btnAgrgar btn nuevo" type='submit') Agregar mascota                         
+          input.form-control( type='hidden', value=token, name="token")          
+          button(class="btnAgrgar btn nuevo" type='submit') Agregar mascota   
+        
         table
             caption Mis mascotas
             thead
@@ -48,30 +55,10 @@ html(lang='en')
                   form(action="verUnaMascota" method='POST') 
                     input(type="hidden", value=mascota.idMascota, name='IdMascota')
                     input(type="hidden", value=usuario.idUsuario, name='IdUsuario')
+                    input(type="hidden", value=token, name='token')
                     button(class="btn info") Ver mascota
-                  //td(data-label='')                          
-                    form(action="" method='POST') 
-                      input(type="hidden" value= mascota.idMascota)
-                      button Eliminar                        
-                //tr
-                    td(data-label='Id Mascota') 1
-                    td(data-label='Nombre') Simba
-                    td(data-label='Tipo') Gato
-                    td(data-label='Edad años') 3
-                    td(data-label='Acciones')                          
-                      form(action="verUnaMascota" method='POST') 
-                        input(type="hiden" value= '1')
-                        button ver mascota
-                //tr      
-                    td(data-label='Id Mascota') 2
-                    td(data-label='Nombre') Dingo
-                    td(data-label='Tipo') Perro
-                    td(data-label='Edad años') 5
-                    td(data-label='Acciones')                          
-                      form(action="verUnaMascota" method='POST') 
-                        input(type="text" value= '2')
-                        button ver mascota                      
+                   
                       
-                      
-
+                  s
+    
     script(type='text/javascript' src='/javascripts/main.js')

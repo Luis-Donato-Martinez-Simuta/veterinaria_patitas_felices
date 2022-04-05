@@ -165,6 +165,19 @@
     color: #037971;
   }
   
+  .muevoUsuario {
+    display: block;
+    text-align: right;
+    text-decoration: none;
+    color: #999;
+    font-size: 0.9rem;
+    transition: 0.3s;
+  }
+  
+  .muevoUsuario:hover {
+    color: #037971;
+  }
+  
   .btn {
     display: block;
     width: 100%;

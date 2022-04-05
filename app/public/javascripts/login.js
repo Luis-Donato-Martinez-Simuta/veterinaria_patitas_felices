@@ -18,3 +18,6 @@ inputs.forEach(input => {
 });
 
 
+function nuevoUsuario(){
+    window.location.href = "http://localhost:3000/nuevoUsuario";
+}

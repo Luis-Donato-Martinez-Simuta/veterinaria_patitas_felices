@@ -1,7 +1,14 @@
 var express = require('express');
 var router = express.Router();
+var md5 = require('md5');
 var axios = require('axios');
-const { response } = require('express');
+const {
+  response
+} = require('express');
+const {
+  header
+} = require('express/lib/request');
+var coki;
 
 
 
@@ -13,79 +20,76 @@ router.get('/', function (req, res, next) {
   });
 });
 
+router.get('/VPF/sesionExpirada', function (req, res, next) {
+  res.render('login', {
+    codigoAcceso: 4
+  });
+});
 
 
-router.post('/logueo', function (req, res, next) {
+router.get('/VPF/*', function (req, res, next) {
+  res.render('login', {
+    codigoAcceso: 3
+  });
+});
+
+
+router.post('/VPF/logueo', function (req, res, next) {
   let usuario = {
     usuario: req.body.userName,
-    password: req.body.password
+    password: md5(req.body.password)
   }
 
   if (usuario.usuario == "" || usuario.password == "") {
-    console.log("Campos imcompletos");
+
     res.render("login", {
       codigoAcceso: 2
     })
   } else {
 
     axios({
-      method:"post",
-      url:"http://localhost:8888/loginUser",
-      data: usuario
-    }).then(response => {
+        method: "post",
+        url: "http://localhost:8888/loginUser",
+        data: usuario
+      }).then(response => {
 
-      user = response.data;
-      
-      if(user != ''){
-        console.log(`${user[0]}`);
-        console.log(`${user[1]}`);
-        axios.get("http://localhost:7777/mascota_por_usuario/" + parseInt(user[0]))
-        .then(response => {
-          usuario = response.data;
-          console.log("Usuario: ", usuario)
+        user = response.data;
 
-          res.render("ListaMisMascotas",{
-            usuario: usuario
+        if (user != '') {
+
+          axios({
+            method: "GET",
+            url: "http://localhost:8888/API/mascota_por_usuario/" + parseInt(user[0]),
+            headers: {
+              "Authorization": user[1] + ""
+            }
+          }).then(response => {
+
+            usuario = response.data;
+
+            res.cookie("token", user[1]);
+            res.render("ListaMisMascotas", {
+              usuario: usuario,
+              token: user[1]
+            })
+          }).catch(error => {
+            console.log(error);
+            res.render("construccion");
+          });
+        } else {
+
+          res.render('login', {
+            codigoAcceso: 1
           })
-        }).catch(error => {
-          console.log(error);
-          res.render("construccion")
-        })
-
-        // axios({
-        //   method:"GET",
-        //   url: "http://localhost:7777/mascota_por_usuario/",
-        //   data: parseInt(user[0])
-        // })
-        // .then(response => {
-        //   usuario = response.data;
-        //   console.log("Usuario: ", usuario)
-
-        //   res.render("ListaMisMascotas",{
-        //     usuario: usuario
-        //   })
-
-        // })
-        // .catch(error => {
-        //   console.log(error);
-        //   res.render("construccion")
-        // })
+        }
 
 
-      }else{
-        console.log("No existe usuario");
-        res.render('login',{
-          codigoAcceso: 1
-        })
-      }
-      
-  
-    })
-    .catch(error => {
-      console.log(error);
-      res.render('construccion')
-    })
-  
+      })
+      .catch(error => {
+        console.log(error);
+        res.render('construccion')
+      })
+
   }
 
 
@@ -94,20 +98,29 @@ router.post('/logueo', function (req, res, next) {
 });
 
 // Ver masciota del usuario
-router.post('/verUnaMascota', function (req, res, next) {
+router.post('/VPF/verUnaMascota', function (req, res, next) {
   console.log("Buscando mascota")
   let IdMascota = req.body.IdMascota;
   let IdUsuario = req.body.IdUsuario;
-  let mascota;
-  console.log(IdMascota)
-  axios.get("http://localhost:7777/mascota_por_Id/" + IdMascota)
-    .then((response) => {
+  let token = req.body.token;
 
+  console.log(IdMascota)
+  console.log(token)
+  axios({
+      method: "GET",
+      url: "http://localhost:8888/API/mascota_por_id/" + IdMascota,
+      headers: {
+        Authorization: token
+      }
+    })
+    .then((response) => {
+      let mascota;
       mascota = response.data;
       console.log(mascota);
       res.render('verUnaMascota', {
         mascota: mascota,
-        IdUsuario: IdUsuario
+        IdUsuario: IdUsuario,
+        token: token
       });
     })
     .catch((error) => {
@@ -117,13 +130,14 @@ router.post('/verUnaMascota', function (req, res, next) {
 
 });
 
-router.post('/listaCitasMascotas', function (req, res, next) {
+router.post('/VPF/listaCitasMascotas', function (req, res, next) {
   res.render('listaCitasMascotas');
 });
 
 
-router.post('/guardarMascota', function (req, res, next) {
-
+router.post('/VPF/guardarMascota', function (req, res, next) {
+  console.log("Guardando mascota");
+  let token = req.body.token;
   let mascota = {
     idMascota: req.body.IdMascota,
     idUsuario: req.body.IdUsuario,
@@ -132,47 +146,62 @@ router.post('/guardarMascota', function (req, res, next) {
     nombreMascota: req.body.nombreMascota
   };
   console.log(mascota);
-  axios.post("http://localhost:7777/guardar_mascota", mascota)
+  axios({
+      method: "GET",
+      url: "http://localhost:8888/API/guardar_mascota",
+      data: mascota,
+      headers: {
+        Authorization: token
+      }
+    })
     .then((response) => {
-
+      console.log("Se guardo la mascota");
       mascota = response.data;
       console.log(mascota);
       res.render('verUnaMascota', {
         mascota: mascota,
-        IdUsuario: mascota.idUsuario
+        IdUsuario: mascota.idUsuario,
+        token: token
       });
     })
     .catch((error) => {
-      //console.log(error);
-      res.render('construccion');
-    });
-});
-
-
-
-
-
-router.post('/listaMascotas', function (req, res, next) {
-  let IdUsuario = req.body.IdUsuario
-  axios.get("http://localhost:7777/mascota_por_usuario/" + IdUsuario)
-    .then((response) => {
-
-      let usuario = response.data;
-      console.log(usuario);
-      res.render("ListaMisMascotas", {
-        usuario: usuario
-      })
-    })
-    .catch((error) => {
       console.log(error);
+      console.log("No se guardo la mascota");
       res.render('construccion');
     });
+});
+
+router.post('/VPF/listaMascotas', function (req, res, next) {
+  console.log("Buscando las mascotas del usuario");
+  let IdUsuario = req.body.IdUsuario;
+  let token = req.body.token;
+  console.log(token)
+
+  axios({
+    method: "GET",
+    url: "http://127.0.0.1:8888/API/mascota_por_usuario/" + IdUsuario,
+    headers: {
+      Authorization: token 
+    }
+  }).then(response => {
+    let usuario = response.data;    
+    console.log(usuario);
+    res.render("ListaMisMascotas", {
+      usuario: usuario,
+      token: token
+    })
+  }).catch(error => {
+    console.log(error);
+    console.log(token);
+    res.render("construccion");
+  });
 
 });
 
 
-router.post('/nuevaMascota', function (req, res, next) {
+router.post('/VPF/nuevaMascota', function (req, res, next) {
   console.log("Nueva mascota");
+  let token = req.body.token;
   let mascota = {
     idMascota: 0,
     idUsuario: req.body.IdUsuario,
@@ -183,11 +212,13 @@ router.post('/nuevaMascota', function (req, res, next) {
   console.log(mascota);
   res.render('verUnaMascota', {
     mascota: mascota,
-    IdUsuario: mascota.idUsuario
+    IdUsuario: mascota.idUsuario,
+    token: token
   });
 });
 
-router.post('/eliminarMascota', function (req, res, next) {
+router.post('/VPF/eliminarMascota', function (req, res, next) {
+  let token = req.body.token;
   let mascota = {
     idMascota: req.body.IdMascota,
     idUsuario: req.body.IdUsuario,
@@ -195,7 +226,13 @@ router.post('/eliminarMascota', function (req, res, next) {
     edad: '',
     nombreMascota: ''
   };
-  axios.post("http://localhost:7777/eliminar_mascota/" + mascota.idMascota)
+  axios({
+      method: "GET",
+      url: "http://localhost:8888/API/eliminar_mascota/" + mascota.idMascota,
+      headers: {
+        Authorization: token
+      }
+    })
     .then((response) => {
 
       let respuesta = response.data;
@@ -203,7 +240,8 @@ router.post('/eliminarMascota', function (req, res, next) {
       res.render('verUnaMascota', {
         mascota: mascota,
         IdUsuario: mascota.idUsuario,
-        respuesta: respuesta
+        respuesta: respuesta,
+        token:token
       });
     })
     .catch((error) => {
@@ -214,18 +252,19 @@ router.post('/eliminarMascota', function (req, res, next) {
 });
 
 router.get('/nuevoUsuario', function (req, res, next) {
+  console.log("Nuevo usuario");
   res.render('nuevoUsuario');
 });
 
-module.exports = router;
 
-router.post('/crearUsuario', function (req, res, next) {
 
+router.post('/VPF/crearUsuario', function (req, res, next) {
+  let token = req.body.token;
   let usuario = {
     idUsuario: req.body.IdUsuario,
     nombrePersonal: req.body.nombrePersonal,
     userName: req.body.userName,
-    password: req.body.password,
+    password: md5(req.body.password),
     tipoUsuario: "Cliente",
     edad: req.body.edad,
     telefono: req.body.telefono,
@@ -234,29 +273,42 @@ router.post('/crearUsuario', function (req, res, next) {
   console.log(usuario);
 
 
-  axios.post("http://127.0.0.1:8888/nuevo_usuario", usuario)
+  axios({
+    method : "POST",
+    url: "http://127.0.0.1:8888/API/nuevo_usuario",
+    data : usuario,
+    headers: {
+      Authorization : token
+    }
+  })
     .then((response) => {
-
       let respuesta = response.data;
       console.log(respuesta);
-      if(usuario.idUsuario == 0){
+      if (usuario.idUsuario == 0) {
         res.render('login');
-      }else{
-        axios.get("http://127.0.0.1:8888/usuario_por_id/" + usuario.idUsuario)
-        .then((response) => {
-    
-          let usuario = response.data;
-          console.log(usuario);
-          res.render('miPerfil', {
-            usuario: usuario
-          });
+      } else {
+        axios({
+          method: "GET",
+          url : "http://127.0.0.1:8888/API/usuario_por_id/" + usuario.idUsuario,
+          headers: {
+            Authorization : token
+          }
         })
-        .catch((error) => {
-          console.log(error);
-          res.render('construccion');
-        });
+          .then((response) => {
+
+            let usuario = response.data;
+            console.log(usuario);
+            res.render('miPerfil', {
+              usuario: usuario,
+              token : token
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            res.render('construccion');
+          });
       }
-      
+
     })
     .catch((error) => {
       console.log(error);
@@ -268,18 +320,26 @@ router.post('/crearUsuario', function (req, res, next) {
 
 
 
-router.post('/miPerfil', function (req, res, next) {
+router.post('/VPF/miPerfil', function (req, res, next) {
 
   let IdUsuario = req.body.IdUsuario
+  let token = req.body.token
   console.log(IdUsuario);
 
-  axios.get("http://127.0.0.1:8888/usuario_por_id/" + IdUsuario)
+  axios({
+    method : "GET",
+    url : "http://127.0.0.1:8888/API/usuario_por_id/" + IdUsuario,
+    headers: {
+      Authorization : token
+    }
+  })
     .then((response) => {
 
       let usuario = response.data;
       console.log(usuario);
       res.render('miPerfil', {
-        usuario: usuario
+        usuario: usuario,
+        token:token
       });
     })
     .catch((error) => {
@@ -290,11 +350,10 @@ router.post('/miPerfil', function (req, res, next) {
 
 });
 
+module.exports = router;
+
 /*
 router.post('/', function (req, res, next) {
-
-
   res.render('');
 });
-
 */

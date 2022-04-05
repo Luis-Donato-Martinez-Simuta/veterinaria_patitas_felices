@@ -20,7 +20,7 @@ html(lang='es')
 
   .padre
     .contenedor_form
-      form(action='crearUsuario' method='POST')
+      form(action='/VPFcrearUsuario' method='POST')
         //input.form-control(type='hidden', value=mascota.idMascota, name="IdMascota")
         input.form-control(type='hidden', value=0, name="IdUsuario")
         h2 Datos del Usuario
@@ -50,49 +50,9 @@ html(lang='es')
           br
           input.form-control(required, type='text', value, name="direccion")          
         button(class="btn nuevo",type='submit') Crear usuario     
-      form(action='/' method='GET') 
+      form(action='/VPF/' method='GET') 
         input.form-control(type='hidden', value=IdUsuario, name="IdUsuario")
         button(class="btn cancelar",type='submit') Cancelar        
       
       
-  //.contenedor_form
-    h2 Actualizar producto
-    .form-group
-      label(for='') Codigo producto
-      input.form-control(type='text')
-    .form-group
-      label(for='') Nombre producto
-      input.form-control(type='text')
-    .form-group
-      label(for='') Marca producto
-      input.form-control(type='text')
-    .form-group
-      label(for='') Precio de compra
-      input.form-control(type='text')
-    .form-group
-      label(for='') Cantidad Comprada
-      input.form-control(type='text')
-    button#btn_actualizar_producto.btn.btn-primary(type='submit') Actualizar producto
-  //.contenedor_form
-    h2 Eliminar producto
-    .form-group
-      label(for='') Codigo producto
-      input.form-control(type='text')
-    button#btn_eliminar_producto.btn.btn-primary(type='submit') Eliminar producto
-  //.contenedor_form
-    h2 Consultar producto
-    .form-group
-      label(for='') Codigo producto
-      input.form-control(type='text')
-    button#btn_consultar_producto.btn.btn-primary(type='submit') Consultar producto
-  //.contenedor_form
-    h2 Ventas
-    .form-group
-      label(for='') Codigo producto
-      input.form-control(type='text')
-    .form-group
-      label(for='') Valor de venta
-      input.form-control(type='text')
-    .form-group
-      label(for='') Cantidad vendida
-      input.form-control(type='text')
+    //script(type='text/javascript' src='/javascripts/main.js')

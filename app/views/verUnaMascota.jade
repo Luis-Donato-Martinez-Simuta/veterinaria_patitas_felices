@@ -10,20 +10,23 @@ html(lang='es')
     header
     .navbar
       //button.active(href='#')  #{usuario.userName}
-      form(action="/listaMascotas", method="post") 
+      form(action="/VPF/listaMascotas", method="post") 
         input(type="hidden" value=IdUsuario, name="IdUsuario") 
+        input.form-control(id = "lblToken" type='hidden', value=token, name="token")         
         button.active(href='#')  Mis Mascotas
       //button(href='#')  Conocenos
-      form(action="/miPerfil", method="post") 
+      form(action="/VPF/miPerfil", method="post") 
         input(type="hidden" value=IdUsuario, name="IdUsuario") 
+        input(type="hidden" value=token, name="token") 
         button()  Mi perfil
-      form(action='/',,method='GET')
-        button(href='#')  LogOut
+      form
+        button(onClick='logOut()')  LogOut
   .padre
     .contenedor_form
-      form(action='guardarMascota' method='POST')
-        input.form-control(type='hidden', value=mascota.idMascota, name="IdMascota")
-        input.form-control(type='hidden', value=IdUsuario, name="IdUsuario")
+      form(action='/VPF/guardarMascota' method='POST')
+        input(type='hidden', value=mascota.idMascota, name="IdMascota")
+        input(type='hidden', value=IdUsuario, name="IdUsuario")
+        input(type='hidden', value=token, name="token")        
         h2 Datos de la Mascota
         if respuesta == true
           h3 Mascota eliminada
@@ -44,58 +47,20 @@ html(lang='es')
           br
           input.form-control(type='text')
         button(class="btn guardar",type='submit') Guardar
-      form(action='nuevaMascota' method='POST')
+      form(action='/VPF/nuevaMascota' method='POST')
         input.form-control(type='hidden', value=IdUsuario, name="IdUsuario")
+        input(type='hidden', value=token, name="token")       
         button(class="btn nuevo",type='submit') Nuevo
-      form(action='eliminarMascota' method='POST')
+      form(action='/VPF/eliminarMascota' method='POST')
         input.form-control(type='hidden', value=IdUsuario, name="IdUsuario")
         input.form-control(type='hidden', value=mascota.idMascota, name="IdMascota")
+        input(type='hidden', value=token, name="token")        
         button(class="btn eliminar",type='submit') Eliminar
-      form(action='listaCitasMascotas' method='POST') 
+      form(action='/VPF/listaCitasMascotas' method='POST') 
         button(class="btn info",type='submit') Ver citas
-      form(action='listaMascotas' method='POST') 
+      form(action='/VPF/listaMascotas' method='POST') 
         input.form-control(type='hidden', value=IdUsuario, name="IdUsuario")
+        input(type='hidden', value=token, name="token")      
         button(class="btn cancelar",type='submit') Cancelar        
       
-      
-  //.contenedor_form
-    h2 Actualizar producto
-    .form-group
-      label(for='') Codigo producto
-      input.form-control(type='text')
-    .form-group
-      label(for='') Nombre producto
-      input.form-control(type='text')
-    .form-group
-      label(for='') Marca producto
-      input.form-control(type='text')
-    .form-group
-      label(for='') Precio de compra
-      input.form-control(type='text')
-    .form-group
-      label(for='') Cantidad Comprada
-      input.form-control(type='text')
-    button#btn_actualizar_producto.btn.btn-primary(type='submit') Actualizar producto
-  //.contenedor_form
-    h2 Eliminar producto
-    .form-group
-      label(for='') Codigo producto
-      input.form-control(type='text')
-    button#btn_eliminar_producto.btn.btn-primary(type='submit') Eliminar producto
-  //.contenedor_form
-    h2 Consultar producto
-    .form-group
-      label(for='') Codigo producto
-      input.form-control(type='text')
-    button#btn_consultar_producto.btn.btn-primary(type='submit') Consultar producto
-  //.contenedor_form
-    h2 Ventas
-    .form-group
-      label(for='') Codigo producto
-      input.form-control(type='text')
-    .form-group
-      label(for='') Valor de venta
-      input.form-control(type='text')
-    .form-group
-      label(for='') Cantidad vendida
-      input.form-control(type='text')
+    script(type='text/javascript' src='/javascripts/main.js')
